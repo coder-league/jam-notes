@@ -45,7 +45,9 @@ export function handle(
       return await fn(req, who);
     } catch (e) {
       console.error(e);
-      const msg = e instanceof Error ? e.message : 'server error';
+      // Supabase errors are plain objects, not Error instances, so read .message either way.
+      const raw = (e as { message?: unknown } | null)?.message;
+      const msg = typeof raw === 'string' && raw ? raw : 'server error';
       return json({ error: msg }, 500);
     }
   };
